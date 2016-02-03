@@ -17,21 +17,22 @@ namespace Database2Class_converter
 
         static void Main(string[] args)
         {
-            //Nomi tabelle
-            //SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'DBNAME';
+            Console.WriteLine("host: ");
+            string host = Console.ReadLine();
 
-            //Nomi colonne
-            //SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=? ORDER BY ORDINAL_POSITION;
+            Console.WriteLine("username: ");
+            string user = Console.ReadLine();
 
-            //numerocolonne
-            //SELECT max(ORDINAL_POSITION) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=?;
+            Console.WriteLine("password: ");
+            string password = Console.ReadLine();
+
             Console.WriteLine("DB Name: ");
             string dbname = Console.ReadLine();
 
             Console.WriteLine("Namespace: ");
             string namespacename = Console.ReadLine();
 
-            conn = new MySqlConnection("server=localhost;user=root;database=" + dbname + ";password=test;");
+            conn = new MySqlConnection("server="+host+";user="+user+";database=" + dbname + ";password="+password+";");
             conn.Open();
             cmd = new MySqlCommand("", conn);
             cmd.CommandText = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '"+dbname+"';";
