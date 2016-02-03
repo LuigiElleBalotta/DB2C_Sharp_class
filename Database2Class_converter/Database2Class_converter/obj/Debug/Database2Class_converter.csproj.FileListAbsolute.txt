@@ -1,0 +1,7 @@
+c:\users\luigi\documents\visual studio 2015\Projects\Database2Class_converter\Database2Class_converter\bin\Debug\Database2Class_converter.exe.config
+c:\users\luigi\documents\visual studio 2015\Projects\Database2Class_converter\Database2Class_converter\bin\Debug\Database2Class_converter.exe
+c:\users\luigi\documents\visual studio 2015\Projects\Database2Class_converter\Database2Class_converter\bin\Debug\Database2Class_converter.pdb
+c:\users\luigi\documents\visual studio 2015\Projects\Database2Class_converter\Database2Class_converter\bin\Debug\MySql.Data.dll
+c:\users\luigi\documents\visual studio 2015\Projects\Database2Class_converter\Database2Class_converter\obj\Debug\Database2Class_converter.csprojResolveAssemblyReference.cache
+c:\users\luigi\documents\visual studio 2015\Projects\Database2Class_converter\Database2Class_converter\obj\Debug\Database2Class_converter.exe
+c:\users\luigi\documents\visual studio 2015\Projects\Database2Class_converter\Database2Class_converter\obj\Debug\Database2Class_converter.pdb

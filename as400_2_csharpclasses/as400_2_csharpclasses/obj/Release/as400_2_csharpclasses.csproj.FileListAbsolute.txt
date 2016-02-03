@@ -1,0 +1,10 @@
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\as400_2_csharpclasses.exe.config
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\Interop.cwbx.dll
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.csproj.ResolveComReference.cache
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\as400_2_csharpclasses.exe
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\as400_2_csharpclasses.pdb
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\IBM.Data.DB2.iSeries.dll
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\IBM.Data.DB2.iSeries.xml
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.csprojResolveAssemblyReference.cache
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.exe
+c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.pdb
