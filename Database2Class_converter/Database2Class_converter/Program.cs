@@ -64,10 +64,12 @@ namespace Database2Class_converter
 
                 for (int k = 0; k < columnNames.Count; k++)
                 {
-                    if (dataTypes[k] == "varchar" || dataTypes[k] == "date" || dataTypes[k] == "timestamp" || dataTypes[k].ToLower() == "text" || dataTypes[k].ToLower() == "datetime")
+                    if (dataTypes[k] == "tinytext" || dataTypes[k] == "mediumtext" || dataTypes[k] == "longtext" || dataTypes[k] == "time" || dataTypes[k] == "year" || dataTypes[k] == "varchar" || dataTypes[k] == "date" || dataTypes[k] == "timestamp" || dataTypes[k].ToLower() == "text" || dataTypes[k].ToLower() == "datetime")
                         dataTypes[k] = "string";
-                    if (dataTypes[k].ToLower() == "tinyint" || dataTypes[k].ToLower() == "bigint")
+                    if (dataTypes[k].ToLower() == "tinyint" || dataTypes[k].ToLower() == "bigint" || dataTypes[k].ToLower() == "smallint" || dataTypes[k].ToLower() == "mediumint" || dataTypes[k].ToLower() == "bit")
                         dataTypes[k] = "int";
+                    if (dataTypes[k].ToLower() == "decimal")
+                        dataTypes[k] = "double";
                 }
 
                 string pathstring = "./";
@@ -81,6 +83,7 @@ namespace Database2Class_converter
                     sw.WriteLine("using System.Linq;");
                     sw.WriteLine("using System.Threading.Tasks;");
                     sw.WriteLine("using System.Text;");
+                    sw.WriteLine("using MySql.Data.MySqlClient;");
                     sw.WriteLine("");
                     sw.WriteLine("namespace " + namespacename);
                     sw.WriteLine("{");
@@ -98,8 +101,11 @@ namespace Database2Class_converter
                                 defaultvalue = "\"" + columnDefaults[i] + "\"";
                         }
                         sw.WriteLine("\t\t" + dataTypes[i] + " " + columnName + " = " + defaultvalue + ";");
+                        sw.WriteLine("\t\t" + dataTypes[i] + " OLD_" + columnName + " = " + defaultvalue + ";");
+                        sw.WriteLine("");
                         i++;
                     }
+                    sw.WriteLine("\t\tMySqlConnection conn = null;");
                     sw.WriteLine("");
 
                     List<string> parametri = new List<string>();
@@ -111,13 +117,91 @@ namespace Database2Class_converter
 
                     sw.WriteLine("\t\tpublic " + UppercaseFirst(nome) + "(" + parametristring + ")");
                     sw.WriteLine("\t\t{");
-                    sw.WriteLine("\t\t\t");
+                    for (int k = 0; k < parametri.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\t" + columnNames[k] + " = _" + columnNames[k] + ";");
+                    }
+                    sw.WriteLine("\t\t\tupdateOldValues();");
+                    sw.WriteLine("\t\t}");
+                    sw.WriteLine("");
+                    sw.WriteLine("\t\tpublic void delete()");
+                    sw.WriteLine("\t\t{");
+                    sw.WriteLine("\t\t\tconn.open();");
+                    sw.WriteLine("\t\t\tMySqlCommand cmd = new MySqlCommand(\"\", conn);");
+                    List<string> whereStatementArray = new List<string>();
+                    for(int k = 0; k < columnNames.Count; k++)
+                    {
+                        whereStatementArray.Add(columnNames[k] + " = @" + columnNames[k]);
+                    }
+                    var whereStatementString = String.Join(" AND ", whereStatementArray);
+                    sw.WriteLine("\t\t\tcmd.CommandText = DELETE FROM " + nome + " WHERE " + whereStatementString + ";");
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tMySqlParameter " + columnNames[k].ToLower() + "Parameter = new MySqlParameter(\"@" + columnNames[k] + "\", MySqlDbType.VarChar, 0);"); //always varchar so i don't have problem to handle strings
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\t" + columnNames[k].ToLower() + "Parameter.Value = " + columnNames[k] + ";");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tcmd.Parameters.Add(" + columnNames[k].ToLower() + "Parameter);");
+                    }
+                    sw.WriteLine("\t\t\tcmd.ExecuteNonQuery();");
+                    sw.WriteLine("\t\t\tconn.Close();");
+                    sw.WriteLine("\t\t}");
+                    sw.WriteLine("");
+                    sw.WriteLine("\t\tpublic void update()");
+                    sw.WriteLine("\t\t{");
+                    sw.WriteLine("\t\t\tconn.Open();");
+                    sw.WriteLine("\t\t\tMySqlCommand cmd = new MySqlCommand(\"\", conn);");
+                    List<string> updateStatementArray = new List<string>();
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        updateStatementArray.Add(columnNames[k] + " = @new" + columnNames[k]);
+                    }
+                    var updateStatementString = String.Join(", ", updateStatementArray);
+                    sw.WriteLine("\t\t\tcmd.CommandText = UPDATE " + nome + " SET " + updateStatementString + " WHERE " + whereStatementString + ";");
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tMySqlParameter OLD_" + columnNames[k].ToLower() + "Parameter = new MySqlParameter(\"@" + columnNames[k] + "\", MySqlDbType.VarChar, 0);");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tMySqlParameter " + columnNames[k].ToLower() + "Parameter = new MySqlParameter(\"@new" + columnNames[k] + "\", MySqlDbType.VarChar, 0);");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\t" + columnNames[k].ToLower() + "Parameter.Value = " + columnNames[k] + ";");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tOLD_" + columnNames[k].ToLower() + "Parameter.Value = OLD_" + columnNames[k] + ";");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tcmd.Parameters.Add(" + columnNames[k].ToLower() + "Parameter);");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tcmd.Parameters.Add(OLD_" + columnNames[k].ToLower() + "Parameter);");
+                    }
+                    sw.WriteLine("\t\t\tcmd.ExecuteNonQuery();");
+                    sw.WriteLine("\t\t\tconn.Close();");
+                    sw.WriteLine("\t\t\tupdateOldValues();");
+                    sw.WriteLine("\t\t}");
+                    sw.WriteLine("");
+                    sw.WriteLine("\t\tprivate void updateOldValues()");
+                    sw.WriteLine("\t\t{");
+                    for(int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tOLD_" + columnNames[k] + " = " + columnNames[k] + ";");
+                    }
                     sw.WriteLine("\t\t}");
                     sw.WriteLine("\t}");
                     sw.WriteLine("}");
                     sw.Close();
                 }
-
             }
 
             
@@ -133,7 +217,7 @@ namespace Database2Class_converter
                 return string.Empty;
             }
             // Return char and concat substring.
-            return char.ToUpper(s[0]) + s.Substring(1);
+            return char.ToUpper(s[0]) + s.Substring(1).ToLower();
         }
     }
 }

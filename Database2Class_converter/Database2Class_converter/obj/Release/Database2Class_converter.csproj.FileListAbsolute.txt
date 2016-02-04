@@ -8,3 +8,7 @@ c:\users\luigi\documents\visual studio 2015\Projects\Database2Class_converter\Da
 C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\Database2Class_converter\Database2Class_converter\bin\Release\Database2Class_converter.exe.config
 C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\Database2Class_converter\Database2Class_converter\obj\Release\Database2Class_converter.exe
 C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\Database2Class_converter\Database2Class_converter\obj\Release\Database2Class_converter.pdb
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\Database2Class_converter\Database2Class_converter\bin\Release\Database2Class_converter.exe
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\Database2Class_converter\Database2Class_converter\bin\Release\Database2Class_converter.pdb
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\Database2Class_converter\Database2Class_converter\bin\Release\MySql.Data.dll
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\Database2Class_converter\Database2Class_converter\obj\Release\Database2Class_converter.csprojResolveAssemblyReference.cache
