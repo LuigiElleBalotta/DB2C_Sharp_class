@@ -72,16 +72,23 @@ namespace as400_2_csharpclasses
 
                 for (int k = 0; k < columnNames.Count; k++)
                 {
-                    if (dataTypes[k] == "varchar" || dataTypes[k] == "date" || dataTypes[k] == "timestamp" || dataTypes[k].ToLower() == "text" || dataTypes[k].ToLower() == "datetime")
+                    if (dataTypes[k].ToLower() == "varchar" || dataTypes[k].ToLower() == "date" || dataTypes[k].ToLower() == "timestamp" || dataTypes[k].ToLower() == "text" || dataTypes[k].ToLower() == "datetime" || dataTypes[k].ToLower() == "national character large object" || dataTypes[k].ToLower() == "national character varying")
                         dataTypes[k] = "string";
-                    if (dataTypes[k].ToLower() == "tinyint" || dataTypes[k].ToLower() == "bigint" || dataTypes[k].ToLower() == "integer")
+                    if (dataTypes[k].ToLower() == "tinyint" || dataTypes[k].ToLower() == "bigint" || dataTypes[k].ToLower() == "smallint" || dataTypes[k].ToLower() == "mediumint" || dataTypes[k].ToLower() == "bit" || dataTypes[k].ToLower() == "integer")
                         dataTypes[k] = "int";
 
-                    if (dataTypes[k].ToLower() == "decimal")
+                    if (dataTypes[k].ToLower() == "decimal" || dataTypes[k].ToLower() == "numeric")
                         dataTypes[k] = "double";
 
                     if (dataTypes[k].ToLower() == "character" || dataTypes[k].ToLower() == "character varying")
                         dataTypes[k] = "string";
+
+                    if (columnNames[k].ToLower() == "class")
+                        columnNames[k] = "class_var";
+
+                    if (columnNames[k].ToLower() == "int")
+                        columnNames[k] = "int_var";
+                        
 
                 }
 
@@ -112,15 +119,30 @@ namespace as400_2_csharpclasses
                                 defaultvalue = columnDefaults[i];
                             else
                                 defaultvalue = "\"" + columnDefaults[i] + "\"";
-                            if (defaultvalue == "''")
-                                defaultvalue = "";
                         }
-                        sw.WriteLine("\t\t" + dataTypes[i] + " " + columnName.ToLower() + " = " + defaultvalue + ";");
+                        if ((dataTypes[i].ToLower() == "int" || dataTypes[i].ToLower() == "double") && columnDefaults[i] == "")
+                            defaultvalue = "0";
+
+                        if ((dataTypes[i].ToLower() == "char" && columnDefaults[i].ToLower() == "null") || (dataTypes[i].ToLower() == "char" && columnDefaults[i].ToLower() == ""))
+                            defaultvalue = "Char.MinValue";
+
+                        if ((dataTypes[i].ToLower() == "char" && columnDefaults[i] != ""))
+                            defaultvalue = "'" + columnDefaults[i] + "'";
+
+                        if (((dataTypes[i].ToLower() == "float" && columnDefaults[i].ToLower() == "null") || (dataTypes[i].ToLower() == "float" && columnDefaults[i] == "")) || ((dataTypes[i].ToLower() == "double" && columnDefaults[i].ToLower() == "null") || (dataTypes[i].ToLower() == "double" && columnDefaults[i] == "")))
+                            defaultvalue = "0.0f";
+
+                        if ((dataTypes[i].ToLower() == "float" && columnDefaults[i] != "") || (dataTypes[i].ToLower() == "double" && columnDefaults[i] != ""))
+                            defaultvalue = columnDefaults[i] + "f";
+
+                        if (defaultvalue == "\"''\"" || defaultvalue == "\"CURRENT_DATE\"" || defaultvalue == "\"' '\"")
+                            defaultvalue = "\"\"";
+                        sw.WriteLine("\t\t" + dataTypes[i] + " " + columnName.ToLower() + " { get; set; } = " + defaultvalue + ";");
                         sw.WriteLine("\t\t" + dataTypes[i] + " OLD_" + columnName.ToLower() + " = " + defaultvalue + ";");
                         sw.WriteLine("");
                         i++;
                     }
-                    sw.WriteLine("\t\tiDB2Connection conn = null;");
+                    sw.WriteLine("\t\tiDB2Connection conn = new iDB2Connection(\"Data Source=<HOST>;user id=<USER>;password=<PASSWORD>;\");");
                     sw.WriteLine("");
 
                     List<string> parametri = new List<string>();
@@ -129,7 +151,8 @@ namespace as400_2_csharpclasses
                         parametri.Add(dataTypes[k] + " _" + columnNames[k].ToLower());
                     }
                     var parametristring = String.Join(", ", parametri);
-
+                    sw.WriteLine("\t\tpublic " + UppercaseFirst(nome) + "() { }");
+                    sw.WriteLine("");
                     sw.WriteLine("\t\tpublic " + UppercaseFirst(nome) + "(" + parametristring + ")");
                     sw.WriteLine("\t\t{");
                     for (int k = 0; k < parametri.Count; k++)
@@ -142,7 +165,7 @@ namespace as400_2_csharpclasses
                     sw.WriteLine("");
                     sw.WriteLine("\t\tpublic void delete()");
                     sw.WriteLine("\t\t{");
-                    sw.WriteLine("\t\t\tconn.open();");
+                    sw.WriteLine("\t\t\tconn.Open();");
                     sw.WriteLine("\t\t\tiDB2Command cmd = new iDB2Command(\"\", conn);");
                     List<string> whereStatementArray = new List<string>();
                     for (int k = 0; k < columnNames.Count; k++)
@@ -150,7 +173,7 @@ namespace as400_2_csharpclasses
                         whereStatementArray.Add(columnNames[k] + " = @" + columnNames[k]);
                     }
                     var whereStatementString = String.Join(" AND ", whereStatementArray);
-                    sw.WriteLine("\t\t\tcmd.CommandText = \"DELETE FROM " + nome + " WHERE " + whereStatementString + "\";");
+                    sw.WriteLine("\t\t\tcmd.CommandText = \"DELETE FROM " + dbname + "." + nome + " WHERE " + whereStatementString + "\";");
                     for (int k = 0; k < columnNames.Count; k++)
                     {
                         sw.WriteLine("\t\t\tiDB2Parameter " + columnNames[k].ToLower() + "Parameter = new iDB2Parameter(\"@" + columnNames[k] + "\", iDB2DbType.iDB2VarChar, 0);"); //always varchar so i don't have problem to handle strings
@@ -177,7 +200,7 @@ namespace as400_2_csharpclasses
                         updateStatementArray.Add(columnNames[k] + " = @new" + columnNames[k]);
                     }
                     var updateStatementString = String.Join(", ", updateStatementArray);
-                    sw.WriteLine("\t\t\tcmd.CommandText = \"UPDATE " + nome + " SET " + updateStatementString + " WHERE " + whereStatementString + "\";");
+                    sw.WriteLine("\t\t\tcmd.CommandText = \"UPDATE " + dbname + "." + nome + " SET " + updateStatementString + " WHERE " + whereStatementString + "\";");
                     for (int k = 0; k < columnNames.Count; k++)
                     {
                         sw.WriteLine("\t\t\tiDB2Parameter OLD_" + columnNames[k].ToLower() + "Parameter = new iDB2Parameter(\"@" + columnNames[k] + "\", iDB2DbType.iDB2VarChar, 0);");
