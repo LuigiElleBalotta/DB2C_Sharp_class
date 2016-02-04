@@ -100,12 +100,14 @@ namespace Database2Class_converter
                             else
                                 defaultvalue = "\"" + columnDefaults[i] + "\"";
                         }
+                        if ((dataTypes[i] == "int" || dataTypes[i] == "double") && columnDefaults[i] == "")
+                            defaultvalue = "0";
                         sw.WriteLine("\t\t" + dataTypes[i] + " " + columnName + " = " + defaultvalue + ";");
                         sw.WriteLine("\t\t" + dataTypes[i] + " OLD_" + columnName + " = " + defaultvalue + ";");
                         sw.WriteLine("");
                         i++;
                     }
-                    sw.WriteLine("\t\tMySqlConnection conn = null;");
+                    sw.WriteLine("\t\tMySqlConnection conn = new MySqlConnection(\"server=<HOST>;user=<USER>;database=<DATABASE>;password=<PASSWORD>;\"");
                     sw.WriteLine("");
 
                     List<string> parametri = new List<string>();
@@ -134,7 +136,7 @@ namespace Database2Class_converter
                         whereStatementArray.Add(columnNames[k] + " = @" + columnNames[k]);
                     }
                     var whereStatementString = String.Join(" AND ", whereStatementArray);
-                    sw.WriteLine("\t\t\tcmd.CommandText = DELETE FROM " + nome + " WHERE " + whereStatementString + ";");
+                    sw.WriteLine("\t\t\tcmd.CommandText = \"DELETE FROM " + nome + " WHERE " + whereStatementString + ";\"");
                     for (int k = 0; k < columnNames.Count; k++)
                     {
                         sw.WriteLine("\t\t\tMySqlParameter " + columnNames[k].ToLower() + "Parameter = new MySqlParameter(\"@" + columnNames[k] + "\", MySqlDbType.VarChar, 0);"); //always varchar so i don't have problem to handle strings
@@ -161,7 +163,7 @@ namespace Database2Class_converter
                         updateStatementArray.Add(columnNames[k] + " = @new" + columnNames[k]);
                     }
                     var updateStatementString = String.Join(", ", updateStatementArray);
-                    sw.WriteLine("\t\t\tcmd.CommandText = UPDATE " + nome + " SET " + updateStatementString + " WHERE " + whereStatementString + ";");
+                    sw.WriteLine("\t\t\tcmd.CommandText = \"UPDATE " + nome + " SET " + updateStatementString + " WHERE " + whereStatementString + ";\"");
                     for (int k = 0; k < columnNames.Count; k++)
                     {
                         sw.WriteLine("\t\t\tMySqlParameter OLD_" + columnNames[k].ToLower() + "Parameter = new MySqlParameter(\"@" + columnNames[k] + "\", MySqlDbType.VarChar, 0);");
