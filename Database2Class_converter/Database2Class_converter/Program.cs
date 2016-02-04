@@ -47,11 +47,13 @@ namespace Database2Class_converter
             {
                 Console.WriteLine(nome);
                 cmd = new MySqlCommand("", conn);
-                cmd.CommandText = "SELECT COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME= '"+nome+"' AND TABLE_SCHEMA = '"+dbname+"' ORDER BY ORDINAL_POSITION;";
+                cmd.CommandText = "SELECT COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, COLUMN_TYPE, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME= '"+nome+"' AND TABLE_SCHEMA = '"+dbname+"' ORDER BY ORDINAL_POSITION;";
                 List<string> columnNames = new List<string>();
                 List<string> columnDefaults = new List<string>();
                 List<string> areNullables = new List<string>();
                 List<string> dataTypes = new List<string>();
+                List<string> columnTypes = new List<string>();
+                List<string> columnComments = new List<string>();
                 row = cmd.ExecuteReader();
                 while(row.Read())
                 {
@@ -59,17 +61,27 @@ namespace Database2Class_converter
                     columnDefaults.Add(row["COLUMN_DEFAULT"].ToString());
                     areNullables.Add(row["IS_NULLABLE"].ToString());
                     dataTypes.Add(row["DATA_TYPE"].ToString());
+                    columnTypes.Add(row["COLUMN_TYPE"].ToString());
+                    columnComments.Add(row["COLUMN_COMMENT"].ToString());
                 }
                 row.Close();
 
                 for (int k = 0; k < columnNames.Count; k++)
                 {
-                    if (dataTypes[k] == "tinytext" || dataTypes[k] == "mediumtext" || dataTypes[k] == "longtext" || dataTypes[k] == "time" || dataTypes[k] == "year" || dataTypes[k] == "varchar" || dataTypes[k] == "date" || dataTypes[k] == "timestamp" || dataTypes[k].ToLower() == "text" || dataTypes[k].ToLower() == "datetime")
+                    if (dataTypes[k].ToLower() == "tinytext" || dataTypes[k].ToLower() == "mediumtext" || dataTypes[k].ToLower() == "longtext" || dataTypes[k].ToLower() == "time" || dataTypes[k].ToLower() == "year" || dataTypes[k] == "varchar" || dataTypes[k].ToLower() == "date" || dataTypes[k].ToLower() == "timestamp" || dataTypes[k].ToLower() == "text" || dataTypes[k].ToLower() == "datetime")
                         dataTypes[k] = "string";
                     if (dataTypes[k].ToLower() == "tinyint" || dataTypes[k].ToLower() == "bigint" || dataTypes[k].ToLower() == "smallint" || dataTypes[k].ToLower() == "mediumint" || dataTypes[k].ToLower() == "bit")
                         dataTypes[k] = "int";
                     if (dataTypes[k].ToLower() == "decimal")
                         dataTypes[k] = "double";
+                    if (dataTypes[k].ToLower() == "enum")
+                    {
+                        dataTypes[k] = "string";
+                    }
+
+                    if (columnNames[k] == "class")
+                        columnNames[k] = "class_var";
+                        
                 }
 
                 string pathstring = "./";
@@ -99,15 +111,30 @@ namespace Database2Class_converter
                                 defaultvalue = columnDefaults[i];
                             else
                                 defaultvalue = "\"" + columnDefaults[i] + "\"";
+                            if (defaultvalue.Contains(" "))
+                                defaultvalue = "\"" + defaultvalue + "\"";
                         }
                         if ((dataTypes[i] == "int" || dataTypes[i] == "double") && columnDefaults[i] == "")
                             defaultvalue = "0";
-                        sw.WriteLine("\t\t" + dataTypes[i] + " " + columnName + " = " + defaultvalue + ";");
+
+                        if ((dataTypes[i] == "char" && columnDefaults[i] == "null") || (dataTypes[i] == "char" && columnDefaults[i] == ""))
+                            defaultvalue = "Char.MinValue";
+
+                        if ((dataTypes[i] == "char" && columnDefaults[i] != ""))
+                            defaultvalue = "'"+columnDefaults[i]+"'";
+
+                        if ((dataTypes[i] == "float" && columnDefaults[i] == "null") || (dataTypes[i] == "float" && columnDefaults[i] == ""))
+                            defaultvalue = "0.0f";
+
+                        if ((dataTypes[i] == "float" && columnDefaults[i] != ""))
+                            defaultvalue = columnDefaults[i] + "f";
+
+                        sw.WriteLine("\t\t" + dataTypes[i] + " " + columnName + " = " + defaultvalue + "; //Comment: " + columnComments[i]);
                         sw.WriteLine("\t\t" + dataTypes[i] + " OLD_" + columnName + " = " + defaultvalue + ";");
                         sw.WriteLine("");
                         i++;
                     }
-                    sw.WriteLine("\t\tMySqlConnection conn = new MySqlConnection(\"server=<HOST>;user=<USER>;database=<DATABASE>;password=<PASSWORD>;\"");
+                    sw.WriteLine("\t\tMySqlConnection conn = new MySqlConnection(\"server=<HOST>;user=<USER>;database=<DATABASE>;password=<PASSWORD>;\");");
                     sw.WriteLine("");
 
                     List<string> parametri = new List<string>();
@@ -128,7 +155,7 @@ namespace Database2Class_converter
                     sw.WriteLine("");
                     sw.WriteLine("\t\tpublic void delete()");
                     sw.WriteLine("\t\t{");
-                    sw.WriteLine("\t\t\tconn.open();");
+                    sw.WriteLine("\t\t\tconn.Open();");
                     sw.WriteLine("\t\t\tMySqlCommand cmd = new MySqlCommand(\"\", conn);");
                     List<string> whereStatementArray = new List<string>();
                     for(int k = 0; k < columnNames.Count; k++)
@@ -136,7 +163,7 @@ namespace Database2Class_converter
                         whereStatementArray.Add(columnNames[k] + " = @" + columnNames[k]);
                     }
                     var whereStatementString = String.Join(" AND ", whereStatementArray);
-                    sw.WriteLine("\t\t\tcmd.CommandText = \"DELETE FROM " + nome + " WHERE " + whereStatementString + ";\"");
+                    sw.WriteLine("\t\t\tcmd.CommandText = \"DELETE FROM " + nome + " WHERE " + whereStatementString + ";\";");
                     for (int k = 0; k < columnNames.Count; k++)
                     {
                         sw.WriteLine("\t\t\tMySqlParameter " + columnNames[k].ToLower() + "Parameter = new MySqlParameter(\"@" + columnNames[k] + "\", MySqlDbType.VarChar, 0);"); //always varchar so i don't have problem to handle strings
@@ -163,7 +190,7 @@ namespace Database2Class_converter
                         updateStatementArray.Add(columnNames[k] + " = @new" + columnNames[k]);
                     }
                     var updateStatementString = String.Join(", ", updateStatementArray);
-                    sw.WriteLine("\t\t\tcmd.CommandText = \"UPDATE " + nome + " SET " + updateStatementString + " WHERE " + whereStatementString + ";\"");
+                    sw.WriteLine("\t\t\tcmd.CommandText = \"UPDATE " + nome + " SET " + updateStatementString + " WHERE " + whereStatementString + ";\";");
                     for (int k = 0; k < columnNames.Count; k++)
                     {
                         sw.WriteLine("\t\t\tMySqlParameter OLD_" + columnNames[k].ToLower() + "Parameter = new MySqlParameter(\"@" + columnNames[k] + "\", MySqlDbType.VarChar, 0);");

@@ -1,0 +1,140 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Text;
+using MySql.Data.MySqlClient;
+
+namespace WoWAppVisual.Database
+{
+	class Creature_addon
+	{
+		int guid = 0; //Comment: 
+		int OLD_guid = 0;
+
+		int path_id = 0; //Comment: 
+		int OLD_path_id = 0;
+
+		int mount = 0; //Comment: 
+		int OLD_mount = 0;
+
+		int bytes1 = 0; //Comment: 
+		int OLD_bytes1 = 0;
+
+		int bytes2 = 0; //Comment: 
+		int OLD_bytes2 = 0;
+
+		int emote = 0; //Comment: 
+		int OLD_emote = 0;
+
+		string auras = null; //Comment: 
+		string OLD_auras = null;
+
+		MySqlConnection conn = new MySqlConnection("server=<HOST>;user=<USER>;database=<DATABASE>;password=<PASSWORD>;");
+
+		public Creature_addon(int _guid, int _path_id, int _mount, int _bytes1, int _bytes2, int _emote, string _auras)
+		{
+			guid = _guid;
+			path_id = _path_id;
+			mount = _mount;
+			bytes1 = _bytes1;
+			bytes2 = _bytes2;
+			emote = _emote;
+			auras = _auras;
+			updateOldValues();
+		}
+
+		public void delete()
+		{
+			conn.Open();
+			MySqlCommand cmd = new MySqlCommand("", conn);
+			cmd.CommandText = "DELETE FROM creature_addon WHERE guid = @guid AND path_id = @path_id AND mount = @mount AND bytes1 = @bytes1 AND bytes2 = @bytes2 AND emote = @emote AND auras = @auras;";
+			MySqlParameter guidParameter = new MySqlParameter("@guid", MySqlDbType.VarChar, 0);
+			MySqlParameter path_idParameter = new MySqlParameter("@path_id", MySqlDbType.VarChar, 0);
+			MySqlParameter mountParameter = new MySqlParameter("@mount", MySqlDbType.VarChar, 0);
+			MySqlParameter bytes1Parameter = new MySqlParameter("@bytes1", MySqlDbType.VarChar, 0);
+			MySqlParameter bytes2Parameter = new MySqlParameter("@bytes2", MySqlDbType.VarChar, 0);
+			MySqlParameter emoteParameter = new MySqlParameter("@emote", MySqlDbType.VarChar, 0);
+			MySqlParameter aurasParameter = new MySqlParameter("@auras", MySqlDbType.VarChar, 0);
+			guidParameter.Value = guid;
+			path_idParameter.Value = path_id;
+			mountParameter.Value = mount;
+			bytes1Parameter.Value = bytes1;
+			bytes2Parameter.Value = bytes2;
+			emoteParameter.Value = emote;
+			aurasParameter.Value = auras;
+			cmd.Parameters.Add(guidParameter);
+			cmd.Parameters.Add(path_idParameter);
+			cmd.Parameters.Add(mountParameter);
+			cmd.Parameters.Add(bytes1Parameter);
+			cmd.Parameters.Add(bytes2Parameter);
+			cmd.Parameters.Add(emoteParameter);
+			cmd.Parameters.Add(aurasParameter);
+			cmd.ExecuteNonQuery();
+			conn.Close();
+		}
+
+		public void update()
+		{
+			conn.Open();
+			MySqlCommand cmd = new MySqlCommand("", conn);
+			cmd.CommandText = "UPDATE creature_addon SET guid = @newguid, path_id = @newpath_id, mount = @newmount, bytes1 = @newbytes1, bytes2 = @newbytes2, emote = @newemote, auras = @newauras WHERE guid = @guid AND path_id = @path_id AND mount = @mount AND bytes1 = @bytes1 AND bytes2 = @bytes2 AND emote = @emote AND auras = @auras;";
+			MySqlParameter OLD_guidParameter = new MySqlParameter("@guid", MySqlDbType.VarChar, 0);
+			MySqlParameter OLD_path_idParameter = new MySqlParameter("@path_id", MySqlDbType.VarChar, 0);
+			MySqlParameter OLD_mountParameter = new MySqlParameter("@mount", MySqlDbType.VarChar, 0);
+			MySqlParameter OLD_bytes1Parameter = new MySqlParameter("@bytes1", MySqlDbType.VarChar, 0);
+			MySqlParameter OLD_bytes2Parameter = new MySqlParameter("@bytes2", MySqlDbType.VarChar, 0);
+			MySqlParameter OLD_emoteParameter = new MySqlParameter("@emote", MySqlDbType.VarChar, 0);
+			MySqlParameter OLD_aurasParameter = new MySqlParameter("@auras", MySqlDbType.VarChar, 0);
+			MySqlParameter guidParameter = new MySqlParameter("@newguid", MySqlDbType.VarChar, 0);
+			MySqlParameter path_idParameter = new MySqlParameter("@newpath_id", MySqlDbType.VarChar, 0);
+			MySqlParameter mountParameter = new MySqlParameter("@newmount", MySqlDbType.VarChar, 0);
+			MySqlParameter bytes1Parameter = new MySqlParameter("@newbytes1", MySqlDbType.VarChar, 0);
+			MySqlParameter bytes2Parameter = new MySqlParameter("@newbytes2", MySqlDbType.VarChar, 0);
+			MySqlParameter emoteParameter = new MySqlParameter("@newemote", MySqlDbType.VarChar, 0);
+			MySqlParameter aurasParameter = new MySqlParameter("@newauras", MySqlDbType.VarChar, 0);
+			guidParameter.Value = guid;
+			path_idParameter.Value = path_id;
+			mountParameter.Value = mount;
+			bytes1Parameter.Value = bytes1;
+			bytes2Parameter.Value = bytes2;
+			emoteParameter.Value = emote;
+			aurasParameter.Value = auras;
+			OLD_guidParameter.Value = OLD_guid;
+			OLD_path_idParameter.Value = OLD_path_id;
+			OLD_mountParameter.Value = OLD_mount;
+			OLD_bytes1Parameter.Value = OLD_bytes1;
+			OLD_bytes2Parameter.Value = OLD_bytes2;
+			OLD_emoteParameter.Value = OLD_emote;
+			OLD_aurasParameter.Value = OLD_auras;
+			cmd.Parameters.Add(guidParameter);
+			cmd.Parameters.Add(path_idParameter);
+			cmd.Parameters.Add(mountParameter);
+			cmd.Parameters.Add(bytes1Parameter);
+			cmd.Parameters.Add(bytes2Parameter);
+			cmd.Parameters.Add(emoteParameter);
+			cmd.Parameters.Add(aurasParameter);
+			cmd.Parameters.Add(OLD_guidParameter);
+			cmd.Parameters.Add(OLD_path_idParameter);
+			cmd.Parameters.Add(OLD_mountParameter);
+			cmd.Parameters.Add(OLD_bytes1Parameter);
+			cmd.Parameters.Add(OLD_bytes2Parameter);
+			cmd.Parameters.Add(OLD_emoteParameter);
+			cmd.Parameters.Add(OLD_aurasParameter);
+			cmd.ExecuteNonQuery();
+			conn.Close();
+			updateOldValues();
+		}
+
+		private void updateOldValues()
+		{
+			OLD_guid = guid;
+			OLD_path_id = path_id;
+			OLD_mount = mount;
+			OLD_bytes1 = bytes1;
+			OLD_bytes2 = bytes2;
+			OLD_emote = emote;
+			OLD_auras = auras;
+		}
+	}
+}
