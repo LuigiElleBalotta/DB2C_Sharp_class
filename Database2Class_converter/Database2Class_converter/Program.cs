@@ -129,7 +129,7 @@ namespace Database2Class_converter
                         if ((dataTypes[i] == "float" && columnDefaults[i] != ""))
                             defaultvalue = columnDefaults[i] + "f";
 
-                        sw.WriteLine("\t\t" + dataTypes[i] + " " + columnName + " = " + defaultvalue + "; //Comment: " + columnComments[i]);
+                        sw.WriteLine("\t\tpublic " + dataTypes[i] + " " + columnName + " { get; set; } = " + defaultvalue + "; //Comment: " + columnComments[i]);
                         sw.WriteLine("\t\t" + dataTypes[i] + " OLD_" + columnName + " = " + defaultvalue + ";");
                         sw.WriteLine("");
                         i++;
@@ -143,7 +143,8 @@ namespace Database2Class_converter
                         parametri.Add(dataTypes[k] + " _" + columnNames[k]);
                     }
                     var parametristring = String.Join(", ", parametri);
-
+                    sw.WriteLine("\t\tpublic " + UppercaseFirst(nome) + "() { }");
+                    sw.WriteLine("");
                     sw.WriteLine("\t\tpublic " + UppercaseFirst(nome) + "(" + parametristring + ")");
                     sw.WriteLine("\t\t{");
                     for (int k = 0; k < parametri.Count; k++)
