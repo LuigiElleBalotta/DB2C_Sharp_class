@@ -25,13 +25,22 @@ namespace as400_2_csharpclasses
 
             //numerocolonne
             //SELECT max(ORDINAL_POSITION) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=?;
+            Console.WriteLine("host: ");
+            string host = Console.ReadLine();
+
+            Console.WriteLine("username: ");
+            string user = Console.ReadLine();
+
+            Console.WriteLine("password: ");
+            string password = Console.ReadLine();
+
             Console.WriteLine("DB Name: ");
             string dbname = Console.ReadLine();
 
             Console.WriteLine("Namespace: ");
             string namespacename = Console.ReadLine();
 
-            conn = new iDB2Connection("Data Source=192.168.150.1;user id=MAX;password=cambiala;");
+            conn = new iDB2Connection("Data Source="+host+";user id="+user+";password="+password+";");
             conn.Open();
             cmd = new iDB2Command("", conn);
             cmd.CommandText = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" + dbname + "'";
@@ -87,6 +96,7 @@ namespace as400_2_csharpclasses
                     sw.WriteLine("using System.Linq;");
                     sw.WriteLine("using System.Threading.Tasks;");
                     sw.WriteLine("using System.Text;");
+                    sw.WriteLine("using IBM.Data.DB2.iSeries;");
                     sw.WriteLine("");
                     sw.WriteLine("namespace " + namespacename);
                     sw.WriteLine("{");
@@ -106,8 +116,11 @@ namespace as400_2_csharpclasses
                                 defaultvalue = "";
                         }
                         sw.WriteLine("\t\t" + dataTypes[i] + " " + columnName.ToLower() + " = " + defaultvalue + ";");
+                        sw.WriteLine("\t\t" + dataTypes[i] + " OLD_" + columnName.ToLower() + " = " + defaultvalue + ";");
+                        sw.WriteLine("");
                         i++;
                     }
+                    sw.WriteLine("\t\tiDB2Connection conn = null;");
                     sw.WriteLine("");
 
                     List<string> parametri = new List<string>();
@@ -119,7 +132,88 @@ namespace as400_2_csharpclasses
 
                     sw.WriteLine("\t\tpublic " + UppercaseFirst(nome) + "(" + parametristring + ")");
                     sw.WriteLine("\t\t{");
-                    sw.WriteLine("\t\t\t");
+                    for (int k = 0; k < parametri.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\t" + columnNames[k].ToLower() + " = _" + columnNames[k].ToLower() + ";");
+                    }
+                    sw.WriteLine("\t\t\tupdateOldValues();");
+                    sw.WriteLine("\t\t}");
+
+                    sw.WriteLine("");
+                    sw.WriteLine("\t\tpublic void delete()");
+                    sw.WriteLine("\t\t{");
+                    sw.WriteLine("\t\t\tconn.open();");
+                    sw.WriteLine("\t\t\tiDB2Command cmd = new iDB2Command(\"\", conn);");
+                    List<string> whereStatementArray = new List<string>();
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        whereStatementArray.Add(columnNames[k] + " = @" + columnNames[k]);
+                    }
+                    var whereStatementString = String.Join(" AND ", whereStatementArray);
+                    sw.WriteLine("\t\t\tcmd.CommandText = \"DELETE FROM " + nome + " WHERE " + whereStatementString + "\";");
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tiDB2Parameter " + columnNames[k].ToLower() + "Parameter = new iDB2Parameter(\"@" + columnNames[k] + "\", iDB2DbType.iDB2VarChar, 0);"); //always varchar so i don't have problem to handle strings
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\t" + columnNames[k].ToLower() + "Parameter.Value = " + columnNames[k].ToLower() + ";");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tcmd.Parameters.Add(" + columnNames[k].ToLower() + "Parameter);");
+                    }
+                    sw.WriteLine("\t\t\tcmd.ExecuteNonQuery();");
+                    sw.WriteLine("\t\t\tconn.Close();");
+                    sw.WriteLine("\t\t}");
+                    sw.WriteLine("");
+                    sw.WriteLine("\t\tpublic void update()");
+                    sw.WriteLine("\t\t{");
+                    sw.WriteLine("\t\t\tconn.Open();");
+                    sw.WriteLine("\t\t\tiDB2Command cmd = new iDB2Command(\"\", conn);");
+                    List<string> updateStatementArray = new List<string>();
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        updateStatementArray.Add(columnNames[k] + " = @new" + columnNames[k]);
+                    }
+                    var updateStatementString = String.Join(", ", updateStatementArray);
+                    sw.WriteLine("\t\t\tcmd.CommandText = \"UPDATE " + nome + " SET " + updateStatementString + " WHERE " + whereStatementString + "\";");
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tiDB2Parameter OLD_" + columnNames[k].ToLower() + "Parameter = new iDB2Parameter(\"@" + columnNames[k] + "\", iDB2DbType.iDB2VarChar, 0);");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tiDB2Parameter " + columnNames[k].ToLower() + "Parameter = new iDB2Parameter(\"@new" + columnNames[k] + "\", iDB2DbType.iDB2VarChar, 0);");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\t" + columnNames[k].ToLower() + "Parameter.Value = " + columnNames[k].ToLower() + ";");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tOLD_" + columnNames[k].ToLower() + "Parameter.Value = OLD_" + columnNames[k].ToLower() + ";");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tcmd.Parameters.Add(" + columnNames[k].ToLower() + "Parameter);");
+                    }
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tcmd.Parameters.Add(OLD_" + columnNames[k].ToLower() + "Parameter);");
+                    }
+                    sw.WriteLine("\t\t\tcmd.ExecuteNonQuery();");
+                    sw.WriteLine("\t\t\tconn.Close();");
+                    sw.WriteLine("\t\t\tupdateOldValues();");
+                    sw.WriteLine("\t\t}");
+                    sw.WriteLine("");
+
+                    sw.WriteLine("\t\tprivate void updateOldValues()");
+                    sw.WriteLine("\t\t{");
+                    for (int k = 0; k < columnNames.Count; k++)
+                    {
+                        sw.WriteLine("\t\t\tOLD_" + columnNames[k].ToLower() + " = " + columnNames[k].ToLower() + ";");
+                    }
                     sw.WriteLine("\t\t}");
                     sw.WriteLine("\t}");
                     sw.WriteLine("}");

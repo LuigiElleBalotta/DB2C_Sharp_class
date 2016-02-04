@@ -8,3 +8,13 @@ c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400
 c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.csprojResolveAssemblyReference.cache
 c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.exe
 c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.pdb
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\as400_2_csharpclasses.exe.config
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\Interop.cwbx.dll
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.csproj.ResolveComReference.cache
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.exe
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.pdb
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\as400_2_csharpclasses.exe
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\as400_2_csharpclasses.pdb
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\IBM.Data.DB2.iSeries.dll
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\bin\Release\IBM.Data.DB2.iSeries.xml
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\obj\Release\as400_2_csharpclasses.csprojResolveAssemblyReference.cache

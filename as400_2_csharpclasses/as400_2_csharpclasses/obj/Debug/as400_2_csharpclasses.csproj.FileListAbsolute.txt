@@ -1,1 +1,4 @@
 c:\users\luigi\documents\visual studio 2015\Projects\as400_2_csharpclasses\as400_2_csharpclasses\bin\Debug\as400_2_csharpclasses.exe.config
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\bin\Debug\as400_2_csharpclasses.exe.config
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\obj\Debug\Interop.cwbx.dll
+C:\Users\luigi\Documents\myproject\DB2CsharpClasses\DB2C_Sharp_class\as400_2_csharpclasses\as400_2_csharpclasses\obj\Debug\as400_2_csharpclasses.csproj.ResolveComReference.cache
